@@ -61,12 +61,12 @@ def move_ev3(action):   # action = move_forword, move_backward, turn_left, turn_
 # sleep(1)
 # move_ev3('move_backward')
 # sleep(1)
-move_ev3('turn_left')
-debug_print(gyro_sensor.value())
-sleep(1)
-move_ev3('turn_right')
-debug_print(gyro_sensor.value())
-sleep(1)
+# move_ev3('turn_left')
+# debug_print(gyro_sensor.value())
+# sleep(1)
+# move_ev3('turn_right')
+# debug_print(gyro_sensor.value())
+# sleep(1)
 
 # # basic move
 # mA.run_forever(speed_sp=360)

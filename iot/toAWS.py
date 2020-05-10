@@ -9,7 +9,8 @@ from __init__ import debug_print
 from config import ELDERLY_ID
 
 logging.basicConfig()
-MQTTClient = AWSIoTMQTTClient("ev3")
+
+MQTTClient = AWSIoTMQTTClient("ev3dev")
 
 def Callback(client, userdata, message):
     payload = message.payload.decode('utf8').replace("'", '"')
@@ -57,7 +58,17 @@ def Callback(client, userdata, message):
 
 def toAWSIoT(topic):
     aws_iot_config(MQTTClient)
-    MQTTClient.connect()
+    # while True:
+    #     try:
+    #         MQTTClient.connect()
+    #         break
+    #     except Exception as e:
+    #         debug_print('fail')
+    #         debug_print(e)
+    #         # Stop the internal worker
+    #         MQTTClient._mqtt_core._event_consumer.stop()
+    #         time.sleep(10)
+    #         continue
 
     while True:
         MQTTClient.subscribe(topic, 1, Callback)

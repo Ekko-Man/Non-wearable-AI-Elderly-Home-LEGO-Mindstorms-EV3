@@ -1,12 +1,14 @@
 import logging
 import json
 import time
+import sys
 import AWSIoTPythonSDK
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 from iot.config import aws_iot_config
 from control import move_ev3
 from __init__ import debug_print
-from config import ELDERLY_ID
+from config import ELDERLY_ID, IOT_ENDPOINT
+from logs.logger import create_logger
 
 logging.basicConfig()
 
@@ -30,57 +32,80 @@ def Callback(client, userdata, message):
     topic = 'iot/ev3/action'
 
     # action = move_forword, move_backward, turn_left, turn_right
-    if status == 'pk':
+    if status == 'fall down':
         topic = 'iot/ev3'
-        pub_message = '{"time": %s ,"elderly": %s ,"status": "recive elderly pk"}' % (now_time, ELDERLY_ID)
-        publish_to_iot(topic, pub_message)
+        # logger = create_logger('Connect to aws')
+        # logger.info('Start \n')
+        # logging.error(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),"\n", e)
         return
     elif status == 'move forward':
         move_ev3('move_forword')
-        pub_message = '{"time": %s ,"elderly": %s ,"status": "move forward"}' % (now_time, ELDERLY_ID)
-        publish_to_iot(topic, pub_message)
         return
     elif status == 'move backward':
         move_ev3('move_backward')
-        pub_message = '{"time": %s ,"elderly": %s ,"status": "move backward"}' % (now_time, ELDERLY_ID)
-        publish_to_iot(topic, pub_message)
         return
     elif status == 'turn left':
         move_ev3('turn_left')
-        pub_message = '{"time": %s ,"elderly": %s ,"status": "turn left"}' % (now_time, ELDERLY_ID)
-        publish_to_iot(topic, pub_message)
         return
     elif status == 'turn right':
         move_ev3('turn_right')
-        pub_message = '{"time": %s ,"elderly": %s ,"status": "turn right"}' % (now_time, ELDERLY_ID)
-        publish_to_iot(topic, pub_message)
+        return
+    else:
         return
 
-def toAWSIoT(topic):
-    aws_iot_config(MQTTClient)
-    # while True:
-    #     try:
-    #         MQTTClient.connect()
-    #         break
-    #     except Exception as e:
-    #         debug_print('fail')
-    #         debug_print(e)
-    #         # Stop the internal worker
-    #         MQTTClient._mqtt_core._event_consumer.stop()
-    #         time.sleep(10)
-    #         continue
+def aws_iot_config(MQTTClient):
+    logging.basicConfig()
 
-    while True:
-        MQTTClient.subscribe(topic, 1, Callback)
-        debug_print('sleep')
-        time.sleep(2)
-        publish_to_iot(topic, '{"elderly": 12345,"status": "pk"}')
+    # Configurations
+    # For TLS mutual authentication
+    debug_print(IOT_ENDPOINT)
+    MQTTClient.configureEndpoint(IOT_ENDPOINT, 8883)
 
-    MQTTClient.unsubscribe(topic)
-    MQTTClient.disconnect()
+    # For TLS mutual authentication with TLS ALPN extension
+    MQTTClient.configureCredentials(u"/home/robot/cert/AmazonRootCA1.pem",
+                                    u"/home/robot/cert/391ba739a7-private.pem.key",
+                                    u"/home/robot/cert/391ba739a7-certificate.pem.crt")
+
+    # Infinite offline Publish queueing
+    MQTTClient.configureOfflinePublishQueueing(-1)
+    MQTTClient.configureDrainingFrequency(2)  # Draining: 2 Hz
+    MQTTClient.configureConnectDisconnectTimeout(10)  # 10 sec
+    MQTTClient.configureMQTTOperationTimeout(5)  # 5 sec
+
+
+    debug_print('#Config and Connected to AWS IoT')
 
 def publish_to_iot(topic, message):
     MQTTClient.publish(topic, message, 0)
+
+def toAWSIoT(topic):
+    aws_iot_config(MQTTClient)
+    while True:
+        times_to_connect = 0
+        try:
+            if times_to_connect == 10:
+                sys.exit()
+            MQTTClient.connect()
+            break
+        except Exception as e:
+            connect_logger = create_logger('Connection')
+            connect_logger.info('Start \n')
+            connect_logger.error(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),"\n", e)
+            debug_print('fail')
+            debug_print(e)
+            # Stop the internal worker
+            MQTTClient._mqtt_core._event_consumer.stop()
+            time.sleep(10)
+            times_to_connect += 1
+            continue
+
+    while True:
+        MQTTClient.subscribe(topic, 1, Callback)    #iot/ev3
+        debug_print('sleep')
+        time.sleep(60)
+        alive_time = str(int(time.time()))
+        publish_to_iot("iot/ev3/alive", '{"elderly": 12345, "alive_time": "%s"}"'%(alive_time))
+
 
 if __name__ == "__main__":
     pass

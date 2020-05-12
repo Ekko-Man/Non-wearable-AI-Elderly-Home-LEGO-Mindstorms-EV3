@@ -42,12 +42,27 @@ def move_ev3(action):   # action = move_forword, move_backward, turn_left, turn_
         if action == 'move_forword' or 'move_backward':
             while sonic_sensor.value() > 200 and not touchsensor_hit() and time() < t_end:
                 sleep(0.005)
+            else:
+                if sonic_sensor.value() < 200:
+                    debug_print('Detected something in front of the robot during moving.')
+                    return
+                if touchsensor_hit():
+                    debug_print("Robot hit something during moving")
+                    return
+            #     logger = create_logger('ev3 movement')
+            #     logger.info('Start \n')
+            #     logging.error(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),"\nThe ev3 had crash something")
         else:
-            debug_print(gyro_sensor.value())
             gyro_sensor.reset()
-            debug_print(gyro_sensor.value())
             while sonic_sensor.value() > 200 and not touchsensor_hit() and gyro_sensor.value() < 15:
                 sleep(0.005)
+            else:
+                if sonic_sensor.value() < 200:
+                    debug_print('Detected something in front of the robot during moving.')
+                    return
+                if touchsensor_hit():
+                    debug_print("Robot hit something during moving")
+                    return
 
         # debug_print(sonic_sensor.value())
         if action != 'turn_left':
@@ -57,16 +72,19 @@ def move_ev3(action):   # action = move_forword, move_backward, turn_left, turn_
     except:
         debug_print('fill wrong action')
 
+# debug_print('for')
 # move_ev3('move_forword')
-# sleep(1)
+
+# debug_print('back')
 # move_ev3('move_backward')
-# sleep(1)
+
+# debug_print('left')
 # move_ev3('turn_left')
 # debug_print(gyro_sensor.value())
-# sleep(1)
+
+# debug_print('right')
 # move_ev3('turn_right')
 # debug_print(gyro_sensor.value())
-# sleep(1)
 
 # # basic move
 # mA.run_forever(speed_sp=360)

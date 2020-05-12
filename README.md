@@ -37,4 +37,5 @@ Create a cron job to check the script is running.
 crontab -l
 crontab -e -u ev3
 ```
+https://stackoverflow.com/questions/45702887/running-python-process-with-cronjob-and-checking-it-is-still-running-every-minut
 

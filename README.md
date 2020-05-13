@@ -19,7 +19,7 @@ sudo chmod -R +x /home/robot
 Create a cron job to check the script is running.
 ```bash
 crontab -l
-crontab -e -u ev3 / crontab -e
+crontab -e
 ```
 
 Add the following code.

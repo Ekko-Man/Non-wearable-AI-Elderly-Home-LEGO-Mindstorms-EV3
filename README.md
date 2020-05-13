@@ -1,5 +1,5 @@
-# fyp-ev3
-IVE FYP lego ev3 
+# Non-wearable AI Elderly Home (LEGO Mindstorms EV3)
+IVE Final Year Project : Non-wearable AI Elderly Home (LEGO Mindstorms EV3)
 
 ## Set up ev3dev
 Following the below instructions to set up the basic configuration for ev3.
@@ -28,8 +28,9 @@ Add the following code.
 ```
 
 ## Reference
-https://stackoverflow.com/questions/45702887/running-python-process-with-cronjob-and-checking-it-is-still-running-every-minut
-https://shian420.pixnet.net/blog/post/350291572-%5Bpython%5D-logging-%E5%B9%AB%E4%BD%A0%E7%B4%80%E9%8C%84%E4%BB%BB%E4%BD%95%E8%A8%8A%E6%81%AF
+https://www.ev3dev.org/
+https://python-ev3dev.readthedocs.io/en/ev3dev-stretch/index.html
+https://github.com/aws/aws-iot-device-sdk-python
 
 
 

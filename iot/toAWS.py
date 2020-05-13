@@ -4,7 +4,6 @@ import time
 import sys
 import AWSIoTPythonSDK
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
-from iot.config import aws_iot_config
 from control import move_ev3
 from __init__ import debug_print
 from config import ELDERLY_ID, IOT_ENDPOINT
@@ -31,24 +30,28 @@ def Callback(client, userdata, message):
 
     topic = 'iot/ev3/action'
 
+    logger = create_logger('ev3_activity')
+    logger.info('Recive Meesage: '+str(payload))
+
     # action = move_forword, move_backward, turn_left, turn_right
     if status == 'fall down':
-        topic = 'iot/ev3'
-        # logger = create_logger('Connect to aws')
-        # logger.info('Start \n')
-        # logging.error(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),"\n", e)
+        logger.info('Elderly fall down')
         return
     elif status == 'move forward':
         move_ev3('move_forword')
+        logger.info('Ev3 move forward')
         return
     elif status == 'move backward':
         move_ev3('move_backward')
+        logger.info('Ev3 move backward')
         return
     elif status == 'turn left':
         move_ev3('turn_left')
+        logger.info('Ev3 turn left')
         return
     elif status == 'turn right':
         move_ev3('turn_right')
+        logger.info('Ev3 turn right')
         return
     else:
         return
@@ -90,7 +93,7 @@ def toAWSIoT(topic):
         except Exception as e:
             connect_logger = create_logger('Connection')
             connect_logger.info('Start \n')
-            connect_logger.error(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),"\n", e)
+            connect_logger.error(e)
             debug_print('fail')
             debug_print(e)
             # Stop the internal worker
@@ -104,7 +107,8 @@ def toAWSIoT(topic):
         debug_print('sleep')
         time.sleep(60)
         alive_time = str(int(time.time()))
-        publish_to_iot("iot/ev3/alive", '{"elderly": 12345, "alive_time": "%s"}"'%(alive_time))
+        publish_to_iot("iot/ev3/alive", '{"elderly_id":"%s","alive_time":"%s"}'%(str(ELDERLY_ID), alive_time))
+
 
 
 if __name__ == "__main__":

@@ -16,7 +16,7 @@ def create_logger(log_folder):
         os.makedirs(dir_path+log_folder)
 
     # file handler
-    fileHandler = logging.FileHandler(dir_path+log_folder+'/'+filename, 'w', 'utf-8')
+    fileHandler = logging.FileHandler(dir_path+log_folder+'/'+filename, 'a', 'utf-8')
     fileHandler.setFormatter(formatter)
     my_logger.addHandler(fileHandler)
 

@@ -11,7 +11,7 @@ apt-get update
 sudo apt-get install cron
 ```
 
-Create and change the shell exript file permission that make sure the crontab can run it.
+Change the file permission that make sure the cron job can run it.
 ```bash
 sudo chmod -R +x /home/robot
 ```
@@ -22,7 +22,7 @@ crontab -l
 crontab -e
 ```
 
-Add the following code.
+Add the following line to create a cron job.
 ```bash
 */10 * * * * /home/robot/ev3dev/cronjob_checker.sh
 ```
